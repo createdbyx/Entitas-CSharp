@@ -28,3 +28,7 @@ Entitas.Unity.CodeGenerator/Entitas.Unity.CodeGenerator-csharp.sln
 Entitas.Unity.CodeGenerator/Entitas.Unity.CodeGenerator.sln
 Entitas.Unity.VisualDebugging/Entitas.Unity.VisualDebugging-csharp.sln
 Entitas.Unity.VisualDebugging/Entitas.Unity.VisualDebugging.sln
+Entitas.Unity Core Library/.vs/
+.vs/
+Entitas.Unity Core Library/Entitas.Unity Core Library.sln
+Entitas.Unity Core Library/Entitas.Unity Core Library-csharp.sln
