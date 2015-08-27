@@ -13,6 +13,10 @@ Temp
 *-CSharp-Editor.csproj
 *-CSharp-Editor-vs.csproj
 
+# UnityVS
+*.CSharp.csproj
+*.CSharp.Editor.csproj
+
 # Xamarin
 obj
 *.userprefs
@@ -32,3 +36,6 @@ Entitas.Unity Core Library/.vs/
 .vs/
 Entitas.Unity Core Library/Entitas.Unity Core Library.sln
 Entitas.Unity Core Library/Entitas.Unity Core Library-csharp.sln
+Entitas.Unity Core Library/Assets/UnityVS/
+Entitas.Unity Core Library/Assets/UnityVS.meta
+Entitas.Unity Core Library/UnityVS.Entitas.Unity Core Library.sln
