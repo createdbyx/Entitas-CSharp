@@ -34,11 +34,11 @@ class describe_Pool : nspec {
             _pool.Count.should_be(1);
         };
 
-        it["doesn't have entites that were not created with CreateEntity()"] = () => {
+        it["doesn't have entities that were not created with CreateEntity()"] = () => {
             _pool.HasEntity(this.CreateEntity()).should_be_false();
         };
 
-        it["has entites that were created with CreateEntity()"] = () => {
+        it["has entities that were created with CreateEntity()"] = () => {
             _pool.HasEntity(_pool.CreateEntity()).should_be_true();
         };
 
@@ -64,7 +64,7 @@ class describe_Pool : nspec {
             e.GetComponents().should_be_empty();
         };
 
-        it["destroys all entites"] = () => {
+        it["destroys all entities"] = () => {
             var e = _pool.CreateEntity();
             e.AddComponentA();
             _pool.CreateEntity();
@@ -126,6 +126,24 @@ class describe_Pool : nspec {
                 eventEntity.should_be_same(e);
             };
 
+            it["Entity is released after OnEntityDestroyed"] = () => {
+                var e = _pool.CreateEntity();
+                Pool eventPool = null;
+                Entity eventEntity = null;
+                _pool.OnEntityDestroyed += (pool, entity) => {
+                    eventPool = pool;
+                    eventEntity = entity;
+                    var newEntity = _pool.CreateEntity();
+                    newEntity.should_not_be_null();
+                    newEntity.should_not_be_same(eventEntity);
+                };
+                _pool.DestroyEntity(e);
+                eventPool.should_be_same(_pool);
+                var reusedEntity = _pool.CreateEntity();
+                eventEntity.should_be_same(e);
+                reusedEntity.should_be_same(e);
+            };
+
             it["dispatches OnGroupCreated when creating a new group"] = () => {
                 Pool eventPool = null;
                 Group eventGroup = null;
@@ -138,10 +156,23 @@ class describe_Pool : nspec {
                 eventGroup.should_be_same(group);
             };
 
-            it["doesn't dispatch OnGroupCreeated when group alredy exists"] = () => {
+            it["doesn't dispatch OnGroupCreated when group alredy exists"] = () => {
                 _pool.GetGroup(Matcher.AllOf(0));
                 _pool.OnGroupCreated += (pool, g) => this.Fail();
                 _pool.GetGroup(Matcher.AllOf(0));
+            };
+
+            it["removes all external delegates when destroying an entity"] = () => {
+                var e = _pool.CreateEntity();
+                e.OnComponentAdded += (entity, index, component) => this.Fail();
+                e.OnComponentRemoved += (entity, index, component) => this.Fail();
+                e.OnComponentReplaced += (entity, index, previousComponent, newComponent) => this.Fail();
+                _pool.DestroyEntity(e);
+                var e2 = _pool.CreateEntity();
+                e2.should_be_same(e);
+                e2.AddComponentA();
+                e2.ReplaceComponentA(Component.A);
+                e2.RemoveComponentA();
             };
         };
 
@@ -169,6 +200,20 @@ class describe_Pool : nspec {
                 entity.should_be_same(e);
             };
 
+            it["returns pushed entity only after observer is cleared"] = () => {
+                var e = _pool.CreateEntity();
+                var groupA = _pool.GetGroup(Matcher.AllOf(new [] { CID.ComponentA }));
+                var observer = new GroupObserver(groupA, GroupEventType.OnEntityAdded);
+                e.AddComponentA();
+                _pool.DestroyEntity(e);
+                var entity1 = _pool.CreateEntity();
+                entity1.HasComponent(CID.ComponentA).should_be_false();
+                entity1.should_not_be_same(e);
+                observer.ClearCollectedEntities();
+                var entity2 = _pool.CreateEntity();
+                entity2.should_be_same(e);
+            };
+
             it["returns new entity"] = () => {
                 var e = _pool.CreateEntity();
                 e.AddComponentA();
@@ -187,7 +232,7 @@ class describe_Pool : nspec {
                 g.GetEntities().should_contain(e);
             };
 
-            context["when in object pool"] = () => {
+            context["when entity gets destroyed and pushed to object pool"] = () => {
                 Entity e = null;
                 before = () => {
                     e = _pool.CreateEntity();
@@ -308,93 +353,6 @@ class describe_Pool : nspec {
                     eA.ReplaceComponent(CID.ComponentA, newComp);
 
                     updated.should_be(1);
-                };
-            };
-        };
-
-        context["getGroup"] = () => {
-            context["AnyOfCompoundMatcher"] = () => {
-                AllOfMatcher allOfA = null;
-                AllOfMatcher allOfB = null;
-                AnyOfCompoundMatcher compound = null;
-                Group group = null;
-                Entity e = null;
-                before = () => {
-                    allOfA = Matcher.AllOf(CID.ComponentA);
-                    allOfB = Matcher.AllOf(CID.ComponentB);
-                    compound = Matcher.AnyOf(allOfA, allOfB);
-                    group = _pool.GetGroup(compound);
-                    e = _pool.CreateEntity();
-                };
-
-                it["adds entity when matching"] = () => {
-                    e.AddComponentA();
-                    compound.Matches(e).should_be_true();
-                    group.Count.should_be(1);
-                };
-
-                it["doesn't add entity when not matching"] = () => {
-                    e.AddComponentC();
-                    compound.Matches(e).should_be_false();
-                    group.Count.should_be(0);
-                };
-
-                it["removes entity when not matching anymore"] = () => {
-                    e.AddComponentA();
-                    e.RemoveComponentA();
-                    group.Count.should_be(0);
-                };
-
-                it["doesn't remove entity when still matching"] = () => {
-                    e.AddComponentA();
-                    e.AddComponentB();
-                    e.RemoveComponentB();
-                    group.Count.should_be(1);
-                };
-            };
-
-            context["AllOfOfCompoundMatcher containing a NoneOfMatcher"] = () => {
-                AllOfMatcher allOfAB = null;
-                NoneOfMatcher noneOfC = null;
-                AllOfCompoundMatcher compound = null;
-                Group group = null;
-                Entity e = null;
-                before = () => {
-                    allOfAB = Matcher.AllOf(CID.ComponentA, CID.ComponentB);
-                    noneOfC = Matcher.NoneOf(CID.ComponentC);
-                    compound = Matcher.AllOf(allOfAB, noneOfC);
-                    group = _pool.GetGroup(compound);
-                    e = _pool.CreateEntity();
-                };
-
-                it["adds entity when matching"] = () => {
-                    e.AddComponentA();
-                    e.AddComponentB();
-                    compound.Matches(e).should_be_true();
-                    group.Count.should_be(1);
-                };
-
-                it["doesn't add entity when not matching"] = () => {
-                    e.AddComponentA();
-                    e.AddComponentB();
-                    e.AddComponentC();
-                    compound.Matches(e).should_be_false();
-                    group.Count.should_be(0);
-                };
-
-                it["removes entity when not matching anymore"] = () => {
-                    e.AddComponentA();
-                    e.AddComponentB();
-                    e.RemoveComponentB();
-                    group.Count.should_be(0);
-                };
-
-                it["doesn't remove entity when still matching"] = () => {
-                    e.AddComponentA();
-                    e.AddComponentB();
-                    e.AddComponentC();
-                    e.RemoveComponentC();
-                    group.Count.should_be(1);
                 };
             };
         };

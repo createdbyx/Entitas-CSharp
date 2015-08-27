@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -74,33 +74,24 @@
     <Compile Include="Tests\Entitas.Unity\describe_Properties.cs" />
     <Compile Include="Tests\Entitas.Unity.CodeGenerator\describe_CodeGeneratorConfig.cs" />
     <Compile Include="Tests\check_namespaces.cs" />
-    <Compile Include="Libraries\Entitas.Unity\EntitasPreferencesConfig.cs" />
-    <Compile Include="Libraries\Entitas.Unity.CodeGenerator\CodeGeneratorConfig.cs" />
-    <Compile Include="Libraries\Entitas.Unity\Properties.cs" />
     <Compile Include="Tests\Entitas.Unity.VisualDebugging\describe_VisualDebuggingConfig.cs" />
     <Compile Include="Tests\Entitas.CodeGenerator\Fixtures\NamespaceComponent.cs" />
     <Compile Include="Tests\Entitas\describe_Systems.cs" />
-    <Compile Include="Tests\Entitas\Fixtures\StartSystemSpy.cs" />
+    <Compile Include="Tests\Entitas\Fixtures\InitializeSystemSpy.cs" />
     <Compile Include="Tests\Entitas\Fixtures\ExecuteSystemSpy.cs" />
-    <Compile Include="Tests\Entitas\Fixtures\StartExecuteSystemSpy.cs" />
+    <Compile Include="Tests\Entitas\Fixtures\InitializeExecuteSystemSpy.cs" />
     <Compile Include="Tests\Entitas.CodeGenerator\describe_PoolsGenerator.cs" />
     <Compile Include="Tests\Entitas.CodeGenerator\describe_SystemExtensionsGenerator.cs" />
-    <Compile Include="Tests\Entitas.CodeGenerator\Fixtures\TestStartSystem.cs" />
+    <Compile Include="Tests\Entitas.CodeGenerator\Fixtures\TestInitializeSystem.cs" />
     <Compile Include="Tests\Entitas.CodeGenerator\Fixtures\TestSystem.cs" />
     <Compile Include="Tests\Entitas.CodeGenerator\Fixtures\TestExecuteSystem.cs" />
-    <Compile Include="Tests\Entitas.CodeGenerator\Fixtures\TestStartExecuteSystem.cs" />
+    <Compile Include="Tests\Entitas.CodeGenerator\Fixtures\TestInitializeExecuteSystem.cs" />
     <Compile Include="Tests\Entitas.CodeGenerator\Fixtures\TestReactiveSystem.cs" />
     <Compile Include="Tests\Entitas.CodeGenerator\Fixtures\FakeSystem.cs" />
     <Compile Include="Tests\Entitas.CodeGenerator\Fixtures\SomeSystem.cs" />
     <Compile Include="Tests\Entitas.CodeGenerator\Fixtures\NamespaceSystem.cs" />
     <Compile Include="Tests\Entitas.CodeGenerator\Fixtures\CtorArgsSystem.cs" />
     <Compile Include="Tests\Entitas.Migration\describe_MigrationUtils.cs" />
-    <Compile Include="Libraries\Entitas.Unity.VisualDebugging\VisualDebuggingConfig.cs" />
-    <Compile Include="Libraries\Entitas.Unity.VisualDebugging\Entity\EntityBehaviour.cs" />
-    <Compile Include="Libraries\Entitas.Unity.VisualDebugging\PoolObserver\PoolObserver.cs" />
-    <Compile Include="Libraries\Entitas.Unity.VisualDebugging\PoolObserver\PoolObserverBehaviour.cs" />
-    <Compile Include="Libraries\Entitas.Unity.VisualDebugging\SystemsObserver\DebugSystems.cs" />
-    <Compile Include="Libraries\Entitas.Unity.VisualDebugging\SystemsObserver\SystemsDebugBehaviour.cs" />
     <Compile Include="Tests\Entitas.Migration\describe_M0180.cs" />
     <Compile Include="Tests\Entitas.Migration\describe_M0190.cs" />
     <Compile Include="Tests\Entitas\Fixtures\MultiReactiveSubSystemSpy.cs" />
@@ -109,10 +100,58 @@
     <Compile Include="Tests\Entitas\Fixtures\ReactiveExcludeSubSystemSpy.cs" />
     <Compile Include="Tests\Entitas\Fixtures\MultiReactiveExcludeSubSystemSpy.cs" />
     <Compile Include="Tests\Entitas\Fixtures\ReactiveEnsureExcludeSubSystemSpy.cs" />
+    <Compile Include="Tests\Entitas.CodeGenerator\Fixtures\Components in multiple pools\BComponent.cs" />
+    <Compile Include="Tests\Entitas.CodeGenerator\Fixtures\Components in multiple pools\AComponent.cs" />
+    <Compile Include="Tests\Entitas.CodeGenerator\Fixtures\Components in multiple pools\CComponent.cs" />
+    <Compile Include="Tests\Entitas.CodeGenerator\Fixtures\Components in multiple pools\DComponent.cs" />
+    <Compile Include="Tests\Entitas.CodeGenerator\Fixtures\Components in multiple pools\EComponent.cs" />
+    <Compile Include="Tests\Entitas.CodeGenerator\Fixtures\Components in multiple pools\FComponent.cs" />
+    <Compile Include="..\Entitas.Unity\Assets\Entitas.Unity\EntitasPreferencesConfig.cs">
+      <Link>Libraries\Entitas.Unity\EntitasPreferencesConfig.cs</Link>
+    </Compile>
+    <Compile Include="..\Entitas.Unity\Assets\Entitas.Unity\Properties.cs">
+      <Link>Libraries\Entitas.Unity\Properties.cs</Link>
+    </Compile>
+    <Compile Include="..\Entitas.Unity.CodeGenerator\Assets\Entitas.Unity.CodeGenerator\CodeGeneratorConfig.cs">
+      <Link>Libraries\Entitas.Unity.CodeGenerator\CodeGeneratorConfig.cs</Link>
+    </Compile>
+    <Compile Include="..\Entitas.Unity.VisualDebugging\Assets\Entitas.Unity.VisualDebugging\VisualDebuggingConfig.cs">
+      <Link>Libraries\Entitas.Unity.VisualDebugging\VisualDebuggingConfig.cs</Link>
+    </Compile>
+    <Compile Include="..\Entitas.Unity.VisualDebugging\Assets\Entitas.Unity.VisualDebugging\Entity\EntityBehaviour.cs">
+      <Link>Libraries\Entitas.Unity.VisualDebugging\Entity\EntityBehaviour.cs</Link>
+    </Compile>
+    <Compile Include="..\Entitas.Unity.VisualDebugging\Assets\Entitas.Unity.VisualDebugging\PoolObserver\PoolObserver.cs">
+      <Link>Libraries\Entitas.Unity.VisualDebugging\PoolObserver\PoolObserver.cs</Link>
+    </Compile>
+    <Compile Include="..\Entitas.Unity.VisualDebugging\Assets\Entitas.Unity.VisualDebugging\PoolObserver\PoolObserverBehaviour.cs">
+      <Link>Libraries\Entitas.Unity.VisualDebugging\PoolObserver\PoolObserverBehaviour.cs</Link>
+    </Compile>
+    <Compile Include="..\Entitas.Unity.VisualDebugging\Assets\Entitas.Unity.VisualDebugging\SystemsObserver\DebugSystems.cs">
+      <Link>Libraries\Entitas.Unity.VisualDebugging\SystemsObserver\DebugSystems.cs</Link>
+    </Compile>
+    <Compile Include="..\Entitas.Unity.VisualDebugging\Assets\Entitas.Unity.VisualDebugging\SystemsObserver\SystemsDebugBehaviour.cs">
+      <Link>Libraries\Entitas.Unity.VisualDebugging\SystemsObserver\SystemsDebugBehaviour.cs</Link>
+    </Compile>
+    <Compile Include="Tests\Entitas.Migration\describe_M0220.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
-    <Folder Include="Tests\Entitas.Migration\Fixtures\" />
+    <Folder Include="Tests\" />
+    <Folder Include="Libraries\" />
+    <Folder Include="Libraries\NSpec\" />
+    <Folder Include="Tests\Entitas\" />
+    <Folder Include="Tests\Entitas.CodeGenerator\" />
+    <Folder Include="Tests\Entitas.Unity\" />
+    <Folder Include="Tests\Entitas\Fixtures\" />
+    <Folder Include="Tests\Entitas.CodeGenerator\Fixtures\" />
+    <Folder Include="Tests\Entitas.Unity.CodeGenerator\" />
+    <Folder Include="Tests\Entitas.Unity.VisualDebugging\" />
+    <Folder Include="Tests\Entitas.Migration\" />
+    <Folder Include="Tests\Entitas.CodeGenerator\Fixtures\Components in multiple pools\" />
+    <Folder Include="Libraries\Entitas.Unity\" />
+    <Folder Include="Libraries\Entitas.Unity.CodeGenerator\" />
+    <Folder Include="Libraries\Entitas.Unity.VisualDebugging\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Libraries\nunit.framework.dll" />
@@ -123,10 +162,6 @@
     <None Include="Libraries\NSpec\NSpecRunner.exe.mdb" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Entitas.Migration\Entitas.Migration.csproj">
-      <Project>{40af9acc-9c00-4edb-8937-9ea9ec4e5f4e}</Project>
-      <Name>Entitas.Migration</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Entitas\Entitas.csproj">
       <Project>{A0A11CC3-8B1E-4345-A5FA-01FC60E581D8}</Project>
       <Name>Entitas</Name>
@@ -135,8 +170,9 @@
       <Project>{4D7C8232-6930-4F13-9D9A-3C32A340BB62}</Project>
       <Name>Entitas.CodeGenerator</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <WCFMetadata Include="Service References\" />
+    <ProjectReference Include="..\Entitas.Migration\Entitas.Migration.csproj">
+      <Project>{40AF9ACC-9C00-4EDB-8937-9EA9EC4E5F4E}</Project>
+      <Name>Entitas.Migration</Name>
+    </ProjectReference>
   </ItemGroup>
 </Project>

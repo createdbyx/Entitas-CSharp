@@ -20,9 +20,16 @@ namespace Entitas {
         protected readonly Dictionary<IMatcher, Group> _groups = new Dictionary<IMatcher, Group>();
         protected readonly List<Group>[] _groupsForIndex;
         readonly Stack<Entity> _entityPool = new Stack<Entity>();
+        readonly HashSet<Entity> _unreleasedEntities = new HashSet<Entity>();
+
         readonly int _totalComponents;
         int _creationIndex;
         Entity[] _entitiesCache;
+
+        // Cached delegates to avoid gc allocations
+        Entity.EntityChanged _updateGroupsComponentAddedOrRemovedCached;
+        Entity.ComponentReplaced _updateGroupsComponentReplacedCached;
+        Entity.EntityReleased _onEntityReleasedCache;
 
         public Pool(int totalComponents) : this(totalComponents, 0) {
         }
@@ -32,17 +39,24 @@ namespace Entitas {
             _creationIndex = startCreationIndex;
             _groupsForIndex = new List<Group>[totalComponents];
             _entityPool = new Stack<Entity>();
+
+            // Cached delegates to avoid gc allocations
+            _updateGroupsComponentAddedOrRemovedCached = updateGroupsComponentAddedOrRemoved;
+            _updateGroupsComponentReplacedCached = updateGroupsComponentReplaced;
+            _onEntityReleasedCache = onEntityReleased;
         }
 
         public virtual Entity CreateEntity() {
             var entity = _entityPool.Count > 0 ? _entityPool.Pop() : new Entity(_totalComponents);
             entity._isEnabled = true;
             entity._creationIndex = _creationIndex++;
+            entity.Retain();
             _entities.Add(entity);
             _entitiesCache = null;
-            entity.OnComponentAdded += onComponentAddedOrRemoved;
-            entity.OnComponentReplaced += onComponentReplaced;
-            entity.OnComponentRemoved += onComponentAddedOrRemoved;
+            entity.OnComponentAdded += _updateGroupsComponentAddedOrRemovedCached;
+            entity.OnComponentReplaced += _updateGroupsComponentReplacedCached;
+            entity.OnComponentRemoved += _updateGroupsComponentAddedOrRemovedCached;
+            entity.OnEntityReleased += _onEntityReleasedCache;
 
             if (OnEntityCreated != null) {
                 OnEntityCreated(this, entity);
@@ -58,21 +72,29 @@ namespace Entitas {
                     "Could not destroy entity!");
             }
             _entitiesCache = null;
-
+            
             if (OnEntityWillBeDestroyed != null) {
                 OnEntityWillBeDestroyed(this, entity);
             }
 
             entity.RemoveAllComponents();
-            entity.OnComponentAdded -= onComponentAddedOrRemoved;
-            entity.OnComponentReplaced -= onComponentReplaced;
-            entity.OnComponentRemoved -= onComponentAddedOrRemoved;
+            entity.OnComponentAdded -= _updateGroupsComponentAddedOrRemovedCached;
+            entity.OnComponentReplaced -= _updateGroupsComponentReplacedCached;
+            entity.OnComponentRemoved -= _updateGroupsComponentAddedOrRemovedCached;
             entity._isEnabled = false;
-            _entityPool.Push(entity);
+            entity.destroy();           
 
             if (OnEntityDestroyed != null) {
                 OnEntityDestroyed(this, entity);
             }
+
+            if (entity._refCount == 1) {
+                entity.OnEntityReleased -= _onEntityReleasedCache;
+                _entityPool.Push(entity);
+            } else {
+                _unreleasedEntities.Add(entity);
+            }
+            entity.Release();
         }
 
         public virtual void DestroyAllEntities() {
@@ -121,7 +143,7 @@ namespace Entitas {
             return group;
         }
 
-        protected void onComponentAddedOrRemoved(Entity entity, int index, IComponent component) {
+        protected void updateGroupsComponentAddedOrRemoved(Entity entity, int index, IComponent component) {
             var groups = _groupsForIndex[index];
             if (groups != null) {
                 for (int i = 0, groupsCount = groups.Count; i < groupsCount; i++) {
@@ -130,13 +152,19 @@ namespace Entitas {
             }
         }
 
-        protected void onComponentReplaced(Entity entity, int index, IComponent previousComponent, IComponent newComponent) {
+        protected void updateGroupsComponentReplaced(Entity entity, int index, IComponent previousComponent, IComponent newComponent) {
             var groups = _groupsForIndex[index];
             if (groups != null) {
                 for (int i = 0, groupsCount = groups.Count; i < groupsCount; i++) {
                     groups[i].UpdateEntity(entity, index, previousComponent, newComponent);
                 }
             }
+        }
+
+        protected void onEntityReleased(Entity entity) {
+            entity.OnEntityReleased -= _onEntityReleasedCache;
+            _entityPool.Push(entity);
+            _unreleasedEntities.Remove(entity);
         }
     }
 

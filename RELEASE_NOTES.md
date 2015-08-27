@@ -1,3 +1,47 @@
+# 0.21.0
+
+##### Fixes
+- Entitas.Migration
+  - Changed target framework to .NET 3.5 to fix build errors in VisualStudio (#22)
+
+##### Entitas
+- Changed pool.DestroyEntity(entity) behaviour
+  - won't trigger group.OnEntityRemoved anymore
+  - triggers group.OnEntityWillBeDestroyed
+  - removes entity from all groupObserver.collectedEntities
+    - ReactiveSystem doesn't pass on destroyed entities anymore
+- ReactiveSystem doesn't call Execute() when filtered entities.Count == 0
+
+
+##### Other
+- Added project files (#18)
+
+
+# 0.20.0
+
+##### Breaking changes
+- Entitas
+  - Removed all matchers except AllOfMatcher
+
+##### Entitas
+- Added `IEnsureComponents` to optionally ensure entities passed in via ReactiveSystem have certain components
+- Added `IExcludeComponents` to optionally exclude entities passed in via ReactiveSystem
+- Added support for multiple PoolAttributes on components
+```cs
+[PoolA, PoolB, PoolC]
+public class SomeComponent : IComponent {}
+```
+
+##### Entitas.Unity.CodeGenerator
+- Added `disabledCodeGenerators` to CodeGeneratorConfig
+- Added code generator toggles to CodeGeneratorPreferencesDrawer
+
+![Entitas.Unity.Codegenerator.disabledcodegenerators](https://cloud.githubusercontent.com/assets/233700/9046406/b4c6b7c2-3a2a-11e5-8624-a8988f684579.png)
+
+##### Entitas.Unity.VisualDebugging
+- Nicer stats
+
+
 # 0.19.1
 
 ##### Entitas
@@ -49,8 +93,8 @@ Please follow the [Entitas upgrade guide](https://github.com/sschmid/Entitas-CSh
 ##### Entitas.Unity.VisualDebugging
 - Displaying nested systems hierarchy for DebugSystems
 
-![entitas unity visualdebugging-debugsystemshierarchy](https://cloud.githubusercontent.com/assets/233700/8761742/6e26dd22-2d61-11e5-943b-94683b7b02ec.png)
-![entitas unity visualdebugging-debugsystemshierarchyeditor](https://cloud.githubusercontent.com/assets/233700/8761746/9628dbfe-2d61-11e5-9b75-570e5c538c0d.png)
+![Entitas.Unity.VisualDebugging-DebugSystemsHierarchy](https://cloud.githubusercontent.com/assets/233700/8761742/6e26dd22-2d61-11e5-943b-94683b7b02ec.png)
+![Entitas.Unity.VisualDebugging-DebugSystemsHierarchyEditor](https://cloud.githubusercontent.com/assets/233700/8761746/9628dbfe-2d61-11e5-9b75-570e5c538c0d.png)
 - Unchecking a ReacitveSystem in VisualDebugging deactivates it
 
 
@@ -141,7 +185,7 @@ new Systems()
 - Displaying Systems.totalSystemsCount in SystemsDebugEditor
 - Added SystemsMonitor visual graph
 
-![Entitas.Unity.VisualDebugging-Debugsystems](https://cloud.githubusercontent.com/assets/233700/8241713/3bf5e3ce-160b-11e5-8876-497bb09c04b1.png)
+![Entitas.Unity.VisualDebugging-DebugSystems](https://cloud.githubusercontent.com/assets/233700/8241713/3bf5e3ce-160b-11e5-8876-497bb09c04b1.png)
 - Removed override DebugSystems.DestroyAllEntities()
 
 

@@ -218,6 +218,25 @@ class describe_Entity : nspec {
             };
         };
 
+        context["reference counting"] = () => {
+            it["dispatches OnEntityReleased when retain and release"] = () => {
+                Entity eventEntity = null;
+                e.OnEntityReleased += entity => {
+                    eventEntity = entity;
+                };
+                e.Retain();
+                e.Release();
+                eventEntity.should_not_be_null();
+                eventEntity.should_be_same(e);
+            };
+
+            it["throws when releasing more than it has been retained"] = expect<EntityIsAlreadyReleasedException>(() => {
+                e.Retain();
+                e.Release();
+                e.Release();
+            });
+        };
+
         context["invalid operations"] = () => {
             it["throws when adding a component of the same type twice"] = expect<EntityAlreadyHasComponentException>(() => {
                 e.AddComponentA();
@@ -359,6 +378,12 @@ class describe_Entity : nspec {
                 it["updates cache when all components were removed"] = () => {
                     e.AddComponentA();
                     e.AddComponentB();
+                    var str = e.ToString();
+                    e.RemoveAllComponents();
+                    e.ToString().should_not_be_same(str);
+                };
+
+                it["updates cache when RemoveAllComponents is called, even if entity has no components"] = () => {
                     var str = e.ToString();
                     e.RemoveAllComponents();
                     e.ToString().should_not_be_same(str);

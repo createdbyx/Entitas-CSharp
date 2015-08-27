@@ -15,7 +15,7 @@ class describe_Group : nspec {
     }
 
     void when_created() {
-        it["doesn't have entites which haven't been added"] = () => {
+        it["doesn't have entities which haven't been added"] = () => {
             _group.GetEntities().should_be_empty();
         };
 
@@ -200,10 +200,79 @@ class describe_Group : nspec {
             };
         };
 
+        context["reference counting"] = () => {
+            it["counts entity reference up on entity added and down on entity removed"] = () => {
+                Entity eventEntity = null;
+                _eA1.OnEntityReleased += entity => {
+                    eventEntity = entity;
+                };
+                handle(_eA1);
+                _eA1.RemoveComponentA();
+                handle(_eA1);
+                eventEntity.should_be_same(_eA1);
+            };
+
+            it["invalidates singleEntityCache"] = () => {
+                _eA1.OnEntityReleased += entity => {
+                    _group.GetSingleEntity().should_be_null();
+                };
+                handle(_eA1);
+                _group.GetSingleEntity();
+                _eA1.RemoveComponentA();
+                handle(_eA1);
+            };
+
+            it["invalidates singleEntityCache"] = () => {
+                _eA1.OnEntityReleased += entity => {
+                    _group.GetSingleEntity().should_be_null();
+                };
+                handleAddEA(_eA1);
+                _group.GetSingleEntity();
+                var c = _eA1.GetComponent(CID.ComponentA);
+                _eA1.RemoveComponentA();
+                handleRemoveEA(_eA1, c);
+            };
+
+            it["invalidates entitiesCache"] = () => {
+                _eA1.OnEntityReleased += entity => {
+                    _group.GetEntities().Length.should_be(0);
+                };
+                handle(_eA1);
+                _group.GetEntities();
+                _eA1.RemoveComponentA();
+                handle(_eA1);
+            };
+
+            it["invalidates entitiesCache"] = () => {
+                _eA1.OnEntityReleased += entity => {
+                    _group.GetEntities().Length.should_be(0);
+                };
+                handleAddEA(_eA1);
+                _group.GetEntities();
+                var c = _eA1.GetComponent(CID.ComponentA);
+                _eA1.RemoveComponentA();
+                handleRemoveEA(_eA1, c);
+            };
+
+            it["retains entity until removed"] = () => {
+                handleAddEA(_eA1);
+                var didRemove = 0;
+                _group.OnEntityRemoved += (group, entity, index, component) => {
+                    didRemove += 1;
+                    entity.GetRefCount().should_be(1);
+                };
+                var c = _eA1.GetComponent(CID.ComponentA);
+                _eA1.RemoveComponentA();
+                handleRemoveEA(_eA1, c);
+
+                didRemove.should_be(1);
+            };
+        };
+
         it["can ToString"] = () => {
-            var m = Matcher.NoneOf(Matcher.AllOf(0), Matcher.AnyOf(1));
+            var m = Matcher.AllOf(Matcher.AllOf(0), Matcher.AllOf(1));
             var group = new Group(m);
-            group.ToString().should_be("Group(NoneOf(AllOf(0), AnyOf(1)))");
+            group.ToString().should_be("Group(AllOf(0, 1))");
         };
     }
 

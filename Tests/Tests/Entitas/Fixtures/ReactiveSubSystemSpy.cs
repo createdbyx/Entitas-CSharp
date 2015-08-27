@@ -1,17 +1,19 @@
 ﻿using System.Collections.Generic;
 using Entitas;
 
-public class ReactiveSubSystemSpy : IStartSystem, IReactiveSystem {
+public class ReactiveSubSystemSpy : IInitializeSystem, IReactiveSystem {
     public int didExecute { get { return _didExecute; } }
 
-    public bool started { get { return _started; } }
+    public bool initialized { get { return _initialized; } }
 
     public Entity[] entities { get { return _entities; } }
+
+    public bool replaceComponentAOnExecute;
 
     readonly IMatcher _matcher;
     readonly GroupEventType _eventType;
     int _didExecute;
-    bool _started;
+    bool _initialized;
     Entity[] _entities;
 
     public ReactiveSubSystemSpy(IMatcher matcher, GroupEventType eventType) {
@@ -19,16 +21,24 @@ public class ReactiveSubSystemSpy : IStartSystem, IReactiveSystem {
         _eventType = eventType;
     }
 
-    public IMatcher trigger { get { return _matcher; } }
+    public TriggerOnEvent trigger { get { return new TriggerOnEvent(_matcher, _eventType); } }
 
-    public GroupEventType eventType { get { return _eventType; } }
-
-    public void Start() {
-        _started = true;
+    public void Initialize() {
+        _initialized = true;
     }
 
+    public System.Action<List<Entity>> executeBlock;
     public void Execute(List<Entity> entities) {
-        _didExecute++;
-        _entities = entities.ToArray();
+	    if(executeBlock == null) {
+			_didExecute++;
+			_entities = entities.ToArray();
+			
+			if (replaceComponentAOnExecute) {
+				var e = _entities[0];
+				e.ReplaceComponentA(Component.A);
+			}
+        } else {
+            executeBlock(entities);
+        }
     }
 }

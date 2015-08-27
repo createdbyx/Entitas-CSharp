@@ -17,38 +17,38 @@ class describe_Systems : nspec {
     void when_systems() {
 
         context["fixtures"] = () => {
-            it["starts StartSystemSpy"] = () => {
-                var startSystem = new StartSystemSpy();
-                startSystem.started.should_be_false();
-                startSystem.Start();
-                startSystem.started.should_be_true();
+            it["initializes InitializeSystemSpy"] = () => {
+                var initializeSystem = new InitializeSystemSpy();
+                initializeSystem.initialized.should_be_false();
+                initializeSystem.Initialize();
+                initializeSystem.initialized.should_be_true();
             };
 
             it["executes ExecuteSystemSpy"] = () => {
-                var startSystem = new ExecuteSystemSpy();
-                startSystem.executed.should_be_false();
-                startSystem.Execute();
-                startSystem.executed.should_be_true();
+                var initializeSystem = new ExecuteSystemSpy();
+                initializeSystem.executed.should_be_false();
+                initializeSystem.Execute();
+                initializeSystem.executed.should_be_true();
             };
 
-            it["starts and executes StartExecuteSystemSpy"] = () => {
-                var startSystem = new StartExecuteSystemSpy();
-                startSystem.started.should_be_false();
-                startSystem.executed.should_be_false();
-                startSystem.Start();
-                startSystem.Execute();
-                startSystem.started.should_be_true();
-                startSystem.executed.should_be_true();
+            it["initializes and executes InitializeExecuteSystemSpy"] = () => {
+                var initializeSystem = new InitializeExecuteSystemSpy();
+                initializeSystem.initialized.should_be_false();
+                initializeSystem.executed.should_be_false();
+                initializeSystem.Initialize();
+                initializeSystem.Execute();
+                initializeSystem.initialized.should_be_true();
+                initializeSystem.executed.should_be_true();
             };
 
             it["executes ReactiveSystemSpy"] = () => {
                 var system = createReactiveSystem();
                 var spy = (ReactiveSubSystemSpy)system.subsystem;
                 spy.didExecute.should_be(0);
-                spy.started.should_be_false();
+                spy.initialized.should_be_false();
                 system.Execute();
                 spy.didExecute.should_be(1);
-                spy.started.should_be_false();
+                spy.initialized.should_be_false();
             };
         };
 
@@ -59,14 +59,14 @@ class describe_Systems : nspec {
             };
 
             it["returns systems when adding system"] = () => {
-                systems.Add(new StartSystemSpy()).should_be_same(systems);
+                systems.Add(new InitializeSystemSpy()).should_be_same(systems);
             };
 
-            it["starts IStartSystem"] = () => {
-                var system = new StartSystemSpy();
+            it["initializes IInitializeSystem"] = () => {
+                var system = new InitializeSystemSpy();
                 systems.Add(system);
-                systems.Start();
-                system.started.should_be_true();
+                systems.Initialize();
+                system.initialized.should_be_true();
             };
 
             it["executes IExecuteSystem"] = () => {
@@ -76,26 +76,26 @@ class describe_Systems : nspec {
                 system.executed.should_be_true();
             };
 
-            it["starts and executes IStartSystem, IExecuteSystem"] = () => {
-                var system = new StartExecuteSystemSpy();
+            it["initializes and executes IInitializeSystem, IExecuteSystem"] = () => {
+                var system = new InitializeExecuteSystemSpy();
                 systems.Add(system);
-                systems.Start();
+                systems.Initialize();
                 systems.Execute();
-                system.started.should_be_true();
+                system.initialized.should_be_true();
                 system.executed.should_be_true();
             };
 
-            it["starts and executes ReactiveSystem"] = () => {
+            it["initializes and executes ReactiveSystem"] = () => {
                 var system = createReactiveSystem();
 
                 systems.Add(system);
-                systems.Start();
+                systems.Initialize();
                 systems.Execute();
                 systems.Execute();
 
                 var spy = (ReactiveSubSystemSpy)system.subsystem;
                 spy.didExecute.should_be(1);
-                spy.started.should_be_true();
+                spy.initialized.should_be_true();
             };
         };
     }
